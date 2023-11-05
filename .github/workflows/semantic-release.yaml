@@ -1,0 +1,143 @@
+name: Semantic Release
+
+on:
+  workflow_call:
+    inputs:
+      dry:
+        description: A boolean parameter that controls whether the action runs in dry-run mode. When set to `true`, no actual releases are created, and the action simulates the release process.
+        type: boolean
+        default: false
+      release-branch:
+        description: The branch where releases are created. This parameter allows you to specify the branch for creating releases. The default is set to `main`.
+        type: string
+        default: main
+    outputs:
+      has_new_version:
+        description: A boolean value indicating if a new version is created or can be created.
+        value: ${{ jobs.release.outputs.has_new_version }}
+      new_version:
+        description: If `has_new_version` is true, this output contains the new version. If the release is not on the specified release branch, the version will be the branch name plus the commit hash.
+        value: ${{ jobs.release.outputs.new_version }}
+      release_notes:
+        description: If `has_new_version` is true, this output contains the release notes in markdown format.
+        value: ${{ jobs.release.outputs.release_note }}
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-22.04
+    outputs:
+      has_new_version: ${{ steps.release.outputs.has_new_version }}
+      new_version: ${{ steps.save-version.outputs.new_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          fetch-depth: 0
+      - name: setup plugins
+        run: |
+          npm install -g semantic-release@22
+          if [[ -f package.json ]]; then
+            mv package.json package.json.tmp
+          fi
+          npm install --no-save @semantic-release/commit-analyzer@11 @semantic-release/release-notes-generator@12 @semantic-release/exec@6 @semantic-release/git@10 @semantic-release/github@9
+          if [[ -f package.json.tmp ]]; then
+             mv package.json.tmp package.json
+          fi
+      - name: setup config
+        run: |
+          cat > .releaserc.yaml << EOF
+          tagFormat: "\${version}"
+          plugins:
+            - "@semantic-release/commit-analyzer"
+            - "@semantic-release/release-notes-generator"
+            - - "@semantic-release/exec"
+              - verifyReleaseCmd: "echo '\${nextRelease.version}' > VERSION.txt;"
+                generateNotesCmd: "echo '\${nextRelease.notes.trim()}' > RELEASE_NOTES.txt;"
+            - "@semantic-release/git"
+            - "@semantic-release/github"
+          EOF
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Trick semantic-release into thinking we're not in a CI environment
+          unset GITHUB_ACTIONS
+          if [[ ${{ inputs.dry }} == 'true' ]]; then
+            npx semantic-release --dry-run --no-ci --branches ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}},${{ inputs.release-branch }}
+          else 
+            npx semantic-release --branches ${{ inputs.release-branch }}
+          fi
+      - name: read release files
+        id: release
+        if: ${{inputs.dry == true}}
+        run: |
+          if [[ -f VERSION.txt ]] && [[ -f RELEASE_NOTES.txt ]]; then
+            echo "release_version=$(cat VERSION.txt)" >> $GITHUB_OUTPUT
+
+            echo "release_note<<EOF" >> $GITHUB_OUTPUT
+            cat RELEASE_NOTES.txt >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+            echo "has_new_version=true" >> $GITHUB_OUTPUT
+          else
+            echo 'has_new_version=false' >> $GITHUB_OUTPUT
+          fi
+      - name: save-version-in-output
+        id: save-version
+        if: ${{ steps.release.outputs.has_new_version == 'true' && inputs.dry == true}}
+        run: |
+          if [[ ${{ github.ref }} == "refs/heads/${{ inputs.release-branch }}" ]]; then
+            echo "new_version=${{ steps.release.outputs.release_version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_version=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}} | sed -r 's/\//_/g')_$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+      - name: write release notes preview
+        uses: actions/github-script@v6
+        if: ${{ github.event_name == 'pull_request' && inputs.dry == true}}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => comment.user.type === 'Bot' && comment.body.includes('# Release Info'))
+            const body = ${{steps.release.outputs.has_new_version}} === true ? 
+            `# Release Info
+             <details>
+               <summary>Release will be <strong>${{ steps.release.outputs.release_version }}</strong>, Show Release Notes</summary>
+
+               ${{ steps.release.outputs.release_note }}
+             </details>` :
+             `# Release Info
+              ⚠⚠⚠ This pull request will not create a new release. ⚠⚠⚠`;
+            if (botComment) {
+              github.rest.issues.updateComment({
+               issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body
+              })
+            }
