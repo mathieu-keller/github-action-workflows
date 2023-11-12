@@ -15,27 +15,37 @@ on:
   push:
     branches:
       - main
+  pull_request:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
-
+  dry:
+    name: dry release
+    uses: mathieu-keller/github-action-workflows/.github/workflows/semantic-release.yaml@main
+    if: ${{ github.ref != 'refs/heads/main' }}
+    with:
+      release-branch: main
+      dry: true
+  show-outputs:
+    needs: [ dry ]
+    runs-on: ubuntu-22.04
     steps:
-    - name: Semantic Release
-      uses: mathieu-keller/github-action-workflows/.github/workflows/semantic-release.yaml@main
-      with:
-        release-branch: main
-        dry: false
-    -   show-outputs:
-        needs: [dry]
-        runs-on: ubuntu-22.04
-        steps:
-          - name: echo
-            run: |
-              echo ${{needs.dry.outputs.has_new_version}}
-              echo ${{needs.dry.outputs.new_version}}
-              echo ${{needs.dry.outputs.release_notes}}
+      - name: echo
+        run: |
+          echo "${{needs.dry.outputs.has_new_version}}"
+          echo "${{needs.dry.outputs.new_version}}"
+          echo "${{needs.dry.outputs.release_notes}}"
+  release:
+    name: create release
+    if: ${{ github.ref == 'refs/heads/main' }}
+    uses: mathieu-keller/github-action-workflows/.github/workflows/semantic-release.yaml@main
+    with:
+      release-branch: main
+      dry: false
 ```
 
 This configuration triggers the workflow on pushes to the `main` branch and uses the semantic release action with the specified options.
@@ -53,8 +63,8 @@ This configuration triggers the workflow on pushes to the `main` branch and uses
 
 ## Example Usage
 
-1. Push changes to the `main` branch.
-2. The workflow will trigger, and if conditions are met, it will create a semantic release and add release notes to pull requests.
+1. Push changes to the `main` branch or to an pull request.
+2. The workflow will trigger, and if conditions are met, it will create a semantic release, or the release notes will be added to the pull requests.
 
 ## Contributing
 

@@ -20,7 +20,7 @@ on:
         value: ${{ jobs.release.outputs.new_version }}
       release_notes:
         description: If `has_new_version` is true, this output contains the release notes in markdown format.
-        value: ${{ jobs.release.outputs.release_note }}
+        value: ${{ jobs.release.outputs.release_notes }}
 
 permissions:
   contents: write
@@ -34,6 +34,7 @@ jobs:
     outputs:
       has_new_version: ${{ steps.release.outputs.has_new_version }}
       new_version: ${{ steps.save-version.outputs.new_version }}
+      release_notes: ${{ steps.release.outputs.release_notes }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -87,7 +88,7 @@ jobs:
           if [[ -f VERSION.txt ]] && [[ -f RELEASE_NOTES.txt ]]; then
             echo "release_version=$(cat VERSION.txt)" >> $GITHUB_OUTPUT
 
-            echo "release_note<<EOF" >> $GITHUB_OUTPUT
+            echo "release_notes<<EOF" >> $GITHUB_OUTPUT
             cat RELEASE_NOTES.txt >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
 
@@ -121,7 +122,7 @@ jobs:
              <details>
                <summary>Release will be <strong>${{ steps.release.outputs.release_version }}</strong>, Show Release Notes</summary>
 
-               ${{ steps.release.outputs.release_note }}
+               ${{ steps.release.outputs.release_notes }}
              </details>` :
              `# Release Info
               ⚠⚠⚠ This pull request will not create a new release. ⚠⚠⚠`;
