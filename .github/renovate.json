@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    ":semanticCommits",
+    "group:monorepos",
+    ":prImmediately",
+    ":prConcurrentLimitNone",
+    ":prHourlyLimitNone"
+  ],
+  "commitMessageAction": "bump",
+  "commitMessageExtra": "from {{{currentValue}}} to {{#if isMajor}}{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}",
+  "commitBodyTable": true,
+  "pre-commit": {
+    "enabled": true
+  },
+  "dependencyDashboard": true,
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "rebase",
+  "platformAutomerge": true
+}
