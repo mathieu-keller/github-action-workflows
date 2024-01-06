@@ -36,9 +36,7 @@ jobs:
     steps:
       - name: echo
         run: |
-          echo "${{needs.dry.outputs.has_new_version}}"
           echo "${{needs.dry.outputs.new_version}}"
-          echo "${{needs.dry.outputs.release_notes}}"
   release:
     name: create release
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -57,9 +55,7 @@ This configuration triggers the workflow on pushes to the `main` branch and uses
 
 ### Action Outputs
 
-- `has_new_version`: A boolean value indicating if a new version is created or can be created.
-- `new_version`: If `has_new_version` is true, this output contains the new version. If the release is not on the specified release branch, the version will be the branch name plus the commit hash.
-- `release_notes`: If `has_new_version` is true, this output contains the release notes in markdown format.
+- `new_version`: this output contains the new version. If the release is not on the specified release branch, the version will be the branch name plus the commit hash.
 
 ## Example Usage
 
