@@ -17,5 +17,22 @@
   "automerge": true,
   "automergeType": "pr",
   "automergeStrategy": "rebase",
-  "platformAutomerge": true
+  "platformAutomerge": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^semantic-release\\.yaml$"],
+      "matchStrings": [
+        "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>\\d+)",
+        "npm install --no-save\\s+(?<depName>@semantic-release/[a-z-]+)@(?<currentValue>\\d+)"
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchFileNames": ["semantic-release.yaml"],
+      "semanticCommitType": "fix"
+    }
+  ]
 }
