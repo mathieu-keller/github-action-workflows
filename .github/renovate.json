@@ -21,12 +21,12 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/^semantic-release\\.yaml$/"
+      "matchFileNames": [
+        "semantic-release.yaml"
       ],
       "matchStrings": [
-        "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>[\\d.]*)\\s*$",
-        "(?<depName>@semantic-release\\/[\\w-]+)@(?<currentValue>[\\d.]*)"
+        "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>[\\d\\.]+)\\s*$",
+        "(?<depName>@semantic-release\\/[\\w-]+)@(?<currentValue>[\\d\\.]+)"
       ],
       "datasourceTemplate": "npm"
     }
