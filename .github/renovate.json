@@ -22,7 +22,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "semantic-release.yaml"
+        "**/semantic-release.yaml"
       ],
       "matchStrings": [
         "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>[\\d\\.]+)\\s*$",
