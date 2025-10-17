@@ -21,8 +21,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^semantic-release\\.yaml$"
+      "managerFilePatterns": [
+        "/^semantic-release\\.yaml$/"
       ],
       "matchStrings": [
         "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>\\d+)",
