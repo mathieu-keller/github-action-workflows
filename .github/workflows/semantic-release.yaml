@@ -47,7 +47,7 @@ jobs:
           node-version: 22
       - name: setup plugins
         run: |
-          npm install -g semantic-release@25
+          npm install -g semantic-release@25.0.0
           if [[ -f package.json ]]; then
             mv package.json package.json.tmp
           fi

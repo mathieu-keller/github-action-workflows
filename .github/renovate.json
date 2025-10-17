@@ -25,8 +25,8 @@
         "/^semantic-release\\.yaml$/"
       ],
       "matchStrings": [
-        "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>\\d+)",
-        "(?<depName>@semantic-release/[\\w-]+)@(?<currentValue>\\d+)"
+        "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>\\d+)\\s*$",
+        "npm install\\s+--no-save\\s+(?<depName>@semantic-release/[\\w-]+)@(?<currentValue>[\\d.]+)"
       ],
       "datasourceTemplate": "npm"
     }
