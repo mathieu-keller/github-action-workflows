@@ -21,7 +21,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "matchFileNames": [
+      "managerFilePatterns": [
         "semantic-release.yaml"
       ],
       "matchStrings": [
