@@ -80,7 +80,6 @@ jobs:
           fi
       - name: read release files
         id: release
-        if: ${{inputs.dry == true}}
         run: |
           if [[ -f VERSION.txt ]]; then
             echo "release_version=$(cat VERSION.txt)" >> $GITHUB_OUTPUT
@@ -90,7 +89,6 @@ jobs:
           fi
       - name: save-version-in-output
         id: save-version
-        if: ${{inputs.dry == true}}
         run: |
           if [[ ${{ github.ref }} == "refs/heads/${{ inputs.release-branch }}" && ${{ steps.release.outputs.has_new_version }} == 'true' ]]; then
             echo "new_version=${{ steps.release.outputs.release_version }}" >> "$GITHUB_OUTPUT"
