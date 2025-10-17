@@ -15,7 +15,9 @@ on:
       new_version:
         description: This output contains the new version. If the release is not on the specified release branch, the version will be the branch name plus the commit hash.
         value: ${{ jobs.release.outputs.new_version }}
-
+      has_new_version:
+        description: This output says if a real new version exists (if only chores are in the new version than it will have no new version number)
+        value: ${{ jobs.release.outputs.has_new_version }}
 permissions:
   contents: write
   issues: write
@@ -27,6 +29,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       new_version: ${{ steps.save-version.outputs.new_version }}
+      has_new_version: ${{ steps.release.outputs.has_new_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -44,11 +47,11 @@ jobs:
           node-version: 22
       - name: setup plugins
         run: |
-          npm install -g semantic-release@22
+          npm install -g semantic-release@25
           if [[ -f package.json ]]; then
             mv package.json package.json.tmp
           fi
-          npm install --no-save @semantic-release/commit-analyzer@11 @semantic-release/release-notes-generator@12 @semantic-release/exec@6 @semantic-release/git@10 @semantic-release/github@9
+          npm install --no-save @semantic-release/commit-analyzer@13 @semantic-release/release-notes-generator@14 @semantic-release/exec@7 @semantic-release/git@10 @semantic-release/github@12
           if [[ -f package.json.tmp ]]; then
              mv package.json.tmp package.json
           fi
