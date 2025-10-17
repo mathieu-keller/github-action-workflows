@@ -26,7 +26,7 @@
       ],
       "matchStrings": [
         "npm install -g\\s+(?<depName>semantic-release)@(?<currentValue>\\d+)",
-        "npm install --no-save\\s+(?<depName>@semantic-release/[\\w-]+)@(?<currentValue>\\d+)"
+        "(?<depName>@semantic-release/[\\w-]+)@(?<currentValue>\\d+)"
       ],
       "datasourceTemplate": "npm"
     }
