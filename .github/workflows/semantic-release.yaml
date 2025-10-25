@@ -58,7 +58,7 @@ jobs:
       - name: setup config
         run: |
           cat > .releaserc.yaml << EOF
-          tagFormat: "\${version}"
+          tagFormat: "v\${version}"
           plugins:
             - "@semantic-release/commit-analyzer"
             - "@semantic-release/release-notes-generator"
