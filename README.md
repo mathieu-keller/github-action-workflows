@@ -1,6 +1,6 @@
 # Semantic Release GitHub Action Workflow
 
-This GitHub Actions workflow automates the process of creating semantic releases and adding release notes to pull requests. It uses the "Mathieu-Keller-Lab/github-action-workflows" repository's semantic release action.
+This GitHub Actions workflow automates the process of creating semantic releases and adding release notes to pull requests. It uses the "mathieu-keller/github-action-workflows" repository's semantic release action.
 
 ## Workflow Configuration
 
@@ -25,7 +25,7 @@ permissions:
 jobs:
   dry:
     name: dry release
-    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@main
+    uses: mathieu-keller/github-action-workflows/.github/workflows/semantic-release.yaml@main
     if: ${{ github.ref != 'refs/heads/main' }}
     with:
       release-branch: main
@@ -40,7 +40,7 @@ jobs:
   release:
     name: create release
     if: ${{ github.ref == 'refs/heads/main' }}
-    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@main
+    uses: mathieu-keller/github-action-workflows/.github/workflows/semantic-release.yaml@main
     with:
       release-branch: main
       dry: false
@@ -64,4 +64,4 @@ This configuration triggers the workflow on pushes to the `main` branch and uses
 
 ## Contributing
 
-If you encounter issues or have suggestions for improvements, feel free to [open an issue](https://github.com/Mathieu-Keller-Lab/github-action-workflows/issues) or [create a pull request](https://github.com/Mathieu-Keller-Lab/github-action-workflows/pulls).
+If you encounter issues or have suggestions for improvements, feel free to [open an issue](https://github.com/mathieu-keller/github-action-workflows/issues) or [create a pull request](https://github.com/mathieu-keller/github-action-workflows/pulls).

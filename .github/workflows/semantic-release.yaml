@@ -26,7 +26,7 @@ permissions:
 jobs:
   release:
     name: release
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04
     outputs:
       new_version: ${{ steps.save-version.outputs.new_version }}
       has_new_version: ${{ steps.release.outputs.has_new_version }}
