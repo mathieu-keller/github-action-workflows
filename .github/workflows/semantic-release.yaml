@@ -51,7 +51,7 @@ jobs:
           if [[ -f package.json ]]; then
             mv package.json package.json.tmp
           fi
-          npm install --no-save @semantic-release/commit-analyzer@13.0.1 @semantic-release/release-notes-generator@14.1.0 @semantic-release/exec@7.1.0 @semantic-release/git@10.0.1 @semantic-release/github@12.0.1
+          npm install --no-save @semantic-release/commit-analyzer@13.0.1 @semantic-release/release-notes-generator@14.1.0 @semantic-release/exec@7.1.0 @semantic-release/git@10.0.1 @semantic-release/github@12.0.2
           if [[ -f package.json.tmp ]]; then
              mv package.json.tmp package.json
           fi
