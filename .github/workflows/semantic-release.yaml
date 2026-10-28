@@ -44,7 +44,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version: 26
       - name: setup plugins
         run: |
           npm install -g semantic-release@25.0.0
